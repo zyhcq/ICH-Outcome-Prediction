@@ -21,7 +21,8 @@ The proposed prognostic tool addresses limitations of existing clinical severity
 - **Automated Hematoma Segmentation**: Uses EfficientMedNeXt-L to accurately isolate hemorrhage on CT scans without manual annotation.
 - **PASH Features**: Automatically stratifies the hematoma by Hounsfield units (HU) to measure high-density fragmentation and low-density dispersion, serving as strong imaging biomarkers.
 - **Imaging-derived GCS (iGCS)**: Bypasses the subjective bedside GCS by regressing automated CT features against true GCS as a surrogate target during training. At test time, iGCS provides a structurally-anchored severity surrogate without needing bedside exams.
-- **High Discrimination**: Extensively validated internally and externally to significantly outperform the established ICH Score.
+- **High Discrimination (iGCS-23)**: The full 23-feature model was extensively validated internally and externally to significantly outperform the established ICH Score.
+- **Highly Interpretable Minimal Model (iGCS + Age)**: A stripped-down, two-variable model combining only the predicted iGCS and patient age. It provides near-equivalent predictive performance to the 23-feature model while offering supreme clinical interpretability through a straightforward nomogram, allowing clinicians to transparently assess risk without a "black-box" algorithm.
 
 ## Usage
 
