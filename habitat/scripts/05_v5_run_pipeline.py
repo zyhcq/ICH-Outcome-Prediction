@@ -301,13 +301,14 @@ def main():
     nri_rad = cfnri(y_te, prob_ours_te, prob_rad_te)
     idi_rad = idi_test(y_te, prob_ours_te, prob_rad_te)
 
-    _, pgcs_auc, _, _ = eval_lr(["pGCS","age"], df_tr, df_te, y_tr, y_te, skf)
-    _, gcs_auc, _, _ = eval_lr(["GCS","age"], df_tr, df_te, y_tr, y_te, skf)
+    _, pgcs_auc, prob_pgcs_te, oof_pgcs = eval_lr(["pGCS","age"], df_tr, df_te, y_tr, y_te, skf)
+    _, gcs_auc, prob_gcs_te, oof_gcs = eval_lr(["GCS","age"], df_tr, df_te, y_tr, y_te, skf)
 
     thresholds = np.arange(0.01, 0.80, 0.005)
     prevalence = np.mean(y_te)
     treat_all = [prevalence - (1-prevalence)*t/(1-t) for t in thresholds]
     nb_ours = [net_benefit(y_te, prob_ours_te, t) for t in thresholds]
+    nb_pgcs = [net_benefit(y_te, prob_pgcs_te, t) for t in thresholds]
     nb_base = [net_benefit(y_te, prob_base_te, t) for t in thresholds]
     nb_rad = [net_benefit(y_te, prob_rad_te, t) for t in thresholds]
 
@@ -315,8 +316,10 @@ def main():
     ax.plot(thresholds, treat_all, 'k--', label='Treat All', linewidth=1, alpha=0.6)
     ax.axhline(y=0, color='gray', linestyle='-', linewidth=0.8, label='Treat None')
     ax.plot(thresholds, nb_ours, color='#e74c3c', linewidth=2.5,
-            label=f'Ours (AUC={ext_auc:.3f})')
-    ax.plot(thresholds, nb_base, color='#3498db', linewidth=2,
+            label=f'iGCS-23 (AUC={ext_auc:.3f})')
+    ax.plot(thresholds, nb_pgcs, color='#3498db', linewidth=2, linestyle='-.',
+            label=f'iGCS+Age (AUC={pgcs_auc:.3f})')
+    ax.plot(thresholds, nb_base, color='#f39c12', linewidth=2,
             label=f'ICH Score (AUC={base_auc:.3f})')
     ax.plot(thresholds, nb_rad, color='#27ae60', linewidth=2, linestyle='--',
             label=f'PyRadiomics LASSO (AUC={rad_auc:.3f})')
@@ -345,6 +348,7 @@ def main():
         "New_ID": df_tr["New_ID"].values,
         "true_mRS3-6": y_tr,
         "pred_proba_Ours": oof_ours,
+        "pred_proba_iGCS_Age": oof_pgcs,
         "pred_proba_Baseline": oof_base,
         "pred_proba_PyRadiomics": oof_rad,
     })
@@ -366,6 +370,7 @@ def main():
         "New_ID": df_te["New_ID"].values,
         "true_mRS3-6": y_te,
         "pred_proba_Ours": prob_ours_te,
+        "pred_proba_iGCS_Age": prob_pgcs_te,
         "pred_proba_Baseline": prob_base_te,
         "pred_proba_PyRadiomics": prob_rad_te,
     })
